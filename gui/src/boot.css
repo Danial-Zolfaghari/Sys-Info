@@ -1,0 +1,46 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #0c0b0a;
+  color: #e8dfd0;
+  font-family: "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+#root {
+  min-height: 100%;
+}
+
+.boot-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 18px;
+  background: #0c0b0a;
+}
+
+.boot-splash::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(201, 162, 39, 0.2);
+  border-top-color: #c9a227;
+  border-radius: 50%;
+  animation: boot-spin 0.9s linear infinite;
+}
+
+.boot-splash span {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5c554c;
+}
+
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

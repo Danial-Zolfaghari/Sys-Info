@@ -1,0 +1,30 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: gui/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m py_compile collector/sys_info_collector.py
+      - run: npm ci
+        working-directory: gui
+      - shell: pwsh
+        run: ./scripts/prepare_build.ps1
+      - run: npm run build
+        working-directory: gui
+      - run: cargo check --manifest-path gui/src-tauri/Cargo.toml
