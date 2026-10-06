@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+    branches: [main]
+    paths:
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: gui/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Determine release
+        id: meta
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ($env:GITHUB_REF -like 'refs/tags/*') { $tag = $env:GITHUB_REF_NAME } else { $tag = 'v1.0.0' }
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) { "exists=true" >> $env:GITHUB_OUTPUT } else { "exists=false" >> $env:GITHUB_OUTPUT }
+
+      - name: Install frontend dependencies
+        if: steps.meta.outputs.exists != 'true'
+        run: npm ci
+        working-directory: gui
+
+      - name: Prepare collector and icons
+        if: steps.meta.outputs.exists != 'true'
+        shell: pwsh
+        run: .\scripts\prepare_build.ps1
+
+      - name: Build Tauri installer
+        if: steps.meta.outputs.exists != 'true'
+        run: npm run tauri build
+        working-directory: gui
+
+      - name: Locate installer and checksum
+        if: steps.meta.outputs.exists != 'true'
+        id: artifact
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem '.\gui\src-tauri\target\release\bundle\nsis' -Filter '*.exe' -File | Select-Object -First 1
+          if (-not $installer) { throw 'SysInfo NSIS installer was not produced.' }
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $($installer.Name)" | Set-Content -Encoding ascii SHA256SUMS.txt
+          "path=$($installer.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Publish GitHub Release
+        if: steps.meta.outputs.exists != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+          INSTALLER_PATH: ${{ steps.artifact.outputs.path }}
+        run: gh release create $env:RELEASE_TAG --target $env:GITHUB_SHA --title $env:RELEASE_TAG --generate-notes $env:INSTALLER_PATH ./SHA256SUMS.txt
