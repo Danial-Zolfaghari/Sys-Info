@@ -12,6 +12,12 @@
   <img alt="Linux" src="https://img.shields.io/badge/Linux-collector%20partial-FCC624?logo=linux&logoColor=black">
   <img alt="macOS" src="https://img.shields.io/badge/macOS-collector%20partial-000000?logo=apple&logoColor=white">
 </p>
+<p align="center">
+  <a href="https://github.com/Danial-Zolfaghari/Sys-Info/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Danial-Zolfaghari/Sys-Info/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/Danial-Zolfaghari/Sys-Info/releases"><img alt="Release" src="https://img.shields.io/github/v/release/Danial-Zolfaghari/Sys-Info?display_name=tag&sort=semver"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/Danial-Zolfaghari/Sys-Info"></a>
+</p>
+
 
 ---
 
