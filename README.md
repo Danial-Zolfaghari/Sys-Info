@@ -37,6 +37,21 @@ The repository includes the complete Tauri backend, collector bundling pipeline 
 
 The supplied `start.bat` and NSIS packaging workflow are Windows-focused.
 
+## Download
+
+The current Windows installer is available from [GitHub Releases](https://github.com/Danial-Zolfaghari/Sys-Info/releases/latest).
+
+Release assets include:
+
+- `SysInfo_1.0.0_x64-setup.exe` — Windows x64 installer
+- `SHA256SUMS.txt` — SHA-256 checksum for verification
+
+Verify the installer in PowerShell:
+
+```powershell
+Get-FileHash .\SysInfo_1.0.0_x64-setup.exe -Algorithm SHA256
+```
+
 ## Architecture
 
 ```mermaid
